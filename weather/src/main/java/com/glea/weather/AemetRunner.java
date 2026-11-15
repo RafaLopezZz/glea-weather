@@ -14,8 +14,7 @@ import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
 
 /**
- * Reads and validates the AEMET station inventory through its two-request API
- * flow.
+ * Reads, validates and resolves the AEMET station inventory in the JDBC catalogue.
  * The API key is sent only to the fixed inventory endpoint; the returned data
  * URL
  * must pass the HTTPS host allowlist before it is requested.
@@ -29,6 +28,7 @@ public class AemetRunner implements CommandLineRunner {
 
     private final RestClient restClient;
     private final String apiKey;
+    private final StationRepository stationRepository;
     private final JsonMapper jsonMapper = JsonMapper.builder().build();
 
     /**
@@ -36,21 +36,30 @@ public class AemetRunner implements CommandLineRunner {
      *
      * @param builder configured client builder
      * @param apiKey  configured credential, which may be absent or blank
+     * @param stationRepository station catalogue
      */
-    public AemetRunner(RestClient.Builder builder, @Value("${AEMET_API_KEY:}") String apiKey) {
+    public AemetRunner(RestClient.Builder builder, @Value("${AEMET_API_KEY:}") String apiKey,
+            StationRepository stationRepository) {
         this.restClient = builder.build();
         this.apiKey = apiKey;
+        this.stationRepository = stationRepository;
     }
 
     /**
-     * Fetches the inventory metadata and validates the linked station data.
+     * Fetches and fully validates the inventory before resolving its catalogue id.
      *
      * @param args unused command-line arguments
      * @throws IllegalStateException when configuration, transport, HTTP, JSON, or
      *                               data validation fails
+     * @throws org.springframework.dao.DataAccessException when catalogue persistence fails
      */
     @Override
     public void run(String... args) {
+        importStationInventory();
+    }
+
+    /** Returns the existing or generated catalogue id after validating the entire response. */
+    long importStationInventory() {
         if (apiKey == null || apiKey.isBlank()) {
             throw new IllegalStateException("AEMET API key is missing or invalid.");
         }
@@ -100,6 +109,7 @@ public class AemetRunner implements CommandLineRunner {
         if (stations.isEmpty()) {
             throw new IllegalStateException("Downloaded station data must not be empty.");
         }
+        StationValidator validator = new StationValidator();
         for (JsonNode station : stations) {
             if (!station.isObject()) {
                 throw new IllegalStateException("Downloaded station entry must be an object.");
@@ -118,7 +128,20 @@ public class AemetRunner implements CommandLineRunner {
             if (!STATION_ID.equals(identifier.stringValue())) {
                 throw new IllegalStateException("Station identifier does not match requested station.");
             }
+            validator.validate("AEMET", identifier.stringValue());
+            JsonNode name = station.get("nombre");
+            if (name != null && !name.isNull() && !name.isString()) {
+                throw new IllegalStateException("Station name must be a string or null.");
+            }
         }
+
+        // Every entry refers to the requested station; resolve it once after full validation.
+        JsonNode station = stations.get(0);
+        String identifier = station.get("indicativo").stringValue();
+        JsonNode name = station.get("nombre");
+        String stationName = name == null || name.isNull() ? null : name.stringValue();
+        return stationRepository.findId("AEMET", identifier)
+                .orElseGet(() -> stationRepository.save("AEMET", identifier, stationName));
     }
 
     /**

@@ -1,6 +1,18 @@
 package com.glea.weather;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.Arguments;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
 import org.springframework.http.HttpHeaders;
@@ -32,6 +44,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.springframework.http.MediaType;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
@@ -41,12 +55,14 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
  */
 public class AemetRunnerTest {
 
+    private final StationRepository repository = mock(StationRepository.class);
+
     /** Tests that the runner fails when AEMET returns an unauthorized response. */
     @Test
     void shouldFailWhenAemetReturnsUnauthorized() {
         RestClient.Builder clientBuilder = RestClient.builder();
         MockRestServiceServer server = MockRestServiceServer.bindTo(clientBuilder).build();
-        AemetRunner runner = new AemetRunner(clientBuilder, "test-api-key");
+        AemetRunner runner = new AemetRunner(clientBuilder, "test-api-key", repository);
 
         String expectedUrl = "https://opendata.aemet.es/opendata/api/valores/climatologicos/inventarioestaciones/estaciones/7211B";
 
@@ -69,7 +85,7 @@ public class AemetRunnerTest {
         RestClient.Builder clientBuilder = RestClient.builder();
         MockRestServiceServer server = MockRestServiceServer.bindTo(clientBuilder).build();
 
-        AemetRunner runner = new AemetRunner(clientBuilder, "test-api-key");
+        AemetRunner runner = new AemetRunner(clientBuilder, "test-api-key", repository);
 
         String expectedUrl = "https://opendata.aemet.es/opendata/api/valores/climatologicos/inventarioestaciones/estaciones/7211B";
 
@@ -111,7 +127,7 @@ public class AemetRunnerTest {
         RestClient.Builder clientBuilder = RestClient.builder();
         MockRestServiceServer server = MockRestServiceServer.bindTo(clientBuilder).build();
 
-        AemetRunner runner = new AemetRunner(clientBuilder, "test-api-key");
+        AemetRunner runner = new AemetRunner(clientBuilder, "test-api-key", repository);
 
         String expectedUrl = "https://opendata.aemet.es/opendata/api/valores/climatologicos/inventarioestaciones/estaciones/7211B";
 
@@ -142,7 +158,7 @@ public class AemetRunnerTest {
     void shouldFailWhenDatosUrlIsMissing() {
         RestClient.Builder clientBuilder = RestClient.builder();
         MockRestServiceServer server = MockRestServiceServer.bindTo(clientBuilder).build();
-        AemetRunner runner = new AemetRunner(clientBuilder, "test-api-key");
+        AemetRunner runner = new AemetRunner(clientBuilder, "test-api-key", repository);
 
         String expectedUrl = "https://opendata.aemet.es/opendata/api/valores/climatologicos/inventarioestaciones/estaciones/7211B";
 
@@ -164,7 +180,7 @@ public class AemetRunnerTest {
     void shouldFailWhenDatosUrlIsEmpty() {
         RestClient.Builder clientBuilder = RestClient.builder();
         MockRestServiceServer server = MockRestServiceServer.bindTo(clientBuilder).build();
-        AemetRunner runner = new AemetRunner(clientBuilder, "test-api-key");
+        AemetRunner runner = new AemetRunner(clientBuilder, "test-api-key", repository);
 
         String expectedUrl = "https://opendata.aemet.es/opendata/api/valores/climatologicos/inventarioestaciones/estaciones/7211B";
 
@@ -188,7 +204,7 @@ public class AemetRunnerTest {
     void shouldFailWhenDatosUrlIsNotAString() {
         RestClient.Builder clientBuilder = RestClient.builder();
         MockRestServiceServer server = MockRestServiceServer.bindTo(clientBuilder).build();
-        AemetRunner runner = new AemetRunner(clientBuilder, "test-api-key");
+        AemetRunner runner = new AemetRunner(clientBuilder, "test-api-key", repository);
 
         String expectedUrl = "https://opendata.aemet.es/opendata/api/valores/climatologicos/inventarioestaciones/estaciones/7211B";
 
@@ -212,7 +228,7 @@ public class AemetRunnerTest {
     void shouldAcceptWhenDatosUrlIsValid() {
         RestClient.Builder clientBuilder = RestClient.builder();
         MockRestServiceServer server = MockRestServiceServer.bindTo(clientBuilder).build();
-        AemetRunner runner = new AemetRunner(clientBuilder, "test-api-key");
+        AemetRunner runner = new AemetRunner(clientBuilder, "test-api-key", repository);
 
         String expectedUrl = "https://opendata.aemet.es/opendata/api/valores/climatologicos/inventarioestaciones/estaciones/7211B";
 
@@ -241,7 +257,7 @@ public class AemetRunnerTest {
     void shouldFailWhenDatosUrlIsMalformed() {
         RestClient.Builder clientBuilder = RestClient.builder();
         MockRestServiceServer server = MockRestServiceServer.bindTo(clientBuilder).build();
-        AemetRunner runner = new AemetRunner(clientBuilder, "test-api-key");
+        AemetRunner runner = new AemetRunner(clientBuilder, "test-api-key", repository);
 
         String expectedUrl = "https://opendata.aemet.es/opendata/api/valores/climatologicos/inventarioestaciones/estaciones/7211B";
 
@@ -268,7 +284,7 @@ public class AemetRunnerTest {
     void shouldFailWhenDatosUrlUsesHttp() {
         RestClient.Builder clientBuilder = RestClient.builder();
         MockRestServiceServer server = MockRestServiceServer.bindTo(clientBuilder).build();
-        AemetRunner runner = new AemetRunner(clientBuilder, "test-api-key");
+        AemetRunner runner = new AemetRunner(clientBuilder, "test-api-key", repository);
 
         String expectedUrl = "https://opendata.aemet.es/opendata/api/valores/climatologicos/inventarioestaciones/estaciones/7211B";
 
@@ -293,7 +309,7 @@ public class AemetRunnerTest {
     void shouldFailWhenDatosUrlHostIsNotAllowed() {
         RestClient.Builder clientBuilder = RestClient.builder();
         MockRestServiceServer server = MockRestServiceServer.bindTo(clientBuilder).build();
-        AemetRunner runner = new AemetRunner(clientBuilder, "test-api-key");
+        AemetRunner runner = new AemetRunner(clientBuilder, "test-api-key", repository);
 
         String expectedUrl = "https://opendata.aemet.es/opendata/api/valores/climatologicos/inventarioestaciones/estaciones/7211B";
 
@@ -318,7 +334,7 @@ public class AemetRunnerTest {
     void shouldFailWhenDatosUrlPortIsNotAllowed() {
         RestClient.Builder clientBuilder = RestClient.builder();
         MockRestServiceServer server = MockRestServiceServer.bindTo(clientBuilder).build();
-        AemetRunner runner = new AemetRunner(clientBuilder, "test-api-key");
+        AemetRunner runner = new AemetRunner(clientBuilder, "test-api-key", repository);
 
         String expectedUrl = "https://opendata.aemet.es/opendata/api/valores/climatologicos/inventarioestaciones/estaciones/7211B";
 
@@ -343,7 +359,7 @@ public class AemetRunnerTest {
     void shouldAcceptWhenDatosUrlUsesPort443() {
         RestClient.Builder clientBuilder = RestClient.builder();
         MockRestServiceServer server = MockRestServiceServer.bindTo(clientBuilder).build();
-        AemetRunner runner = new AemetRunner(clientBuilder, "test-api-key");
+        AemetRunner runner = new AemetRunner(clientBuilder, "test-api-key", repository);
 
         String expectedUrl = "https://opendata.aemet.es/opendata/api/valores/climatologicos/inventarioestaciones/estaciones/7211B";
 
@@ -372,7 +388,7 @@ public class AemetRunnerTest {
     void shouldFailWhenDatosUrlContainsUserInfo() {
         RestClient.Builder clientBuilder = RestClient.builder();
         MockRestServiceServer server = MockRestServiceServer.bindTo(clientBuilder).build();
-        AemetRunner runner = new AemetRunner(clientBuilder, "test-api-key");
+        AemetRunner runner = new AemetRunner(clientBuilder, "test-api-key", repository);
 
         String expectedUrl = "https://opendata.aemet.es/opendata/api/valores/climatologicos/inventarioestaciones/estaciones/7211B";
 
@@ -396,7 +412,7 @@ public class AemetRunnerTest {
     void shouldFailWhenDatosUrlHasInvalidSyntax() {
         RestClient.Builder clientBuilder = RestClient.builder();
         MockRestServiceServer server = MockRestServiceServer.bindTo(clientBuilder).build();
-        AemetRunner runner = new AemetRunner(clientBuilder, "test-api-key");
+        AemetRunner runner = new AemetRunner(clientBuilder, "test-api-key", repository);
 
         String expectedUrl = "https://opendata.aemet.es/opendata/api/valores/climatologicos/inventarioestaciones/estaciones/7211B";
 
@@ -419,7 +435,7 @@ public class AemetRunnerTest {
     void shouldDownloadStationData() {
         RestClient.Builder clientBuilder = RestClient.builder();
         MockRestServiceServer server = MockRestServiceServer.bindTo(clientBuilder).build();
-        AemetRunner runner = new AemetRunner(clientBuilder, "test-api-key");
+        AemetRunner runner = new AemetRunner(clientBuilder, "test-api-key", repository);
 
         String expectedUrl = "https://opendata.aemet.es/opendata/api/valores/climatologicos/inventarioestaciones/estaciones/7211B";
         String datosUrl = "https://opendata.aemet.es/opendata/datos/estacion_7211B.json";
@@ -450,7 +466,7 @@ public class AemetRunnerTest {
     void shouldFailWhenDownloadedDataIsNotJson() {
         RestClient.Builder clientBuilder = RestClient.builder();
         MockRestServiceServer server = MockRestServiceServer.bindTo(clientBuilder).build();
-        AemetRunner runner = new AemetRunner(clientBuilder, "test-api-key");
+        AemetRunner runner = new AemetRunner(clientBuilder, "test-api-key", repository);
 
         String expectedUrl = "https://opendata.aemet.es/opendata/api/valores/climatologicos/inventarioestaciones/estaciones/7211B";
         String datosUrl = "https://opendata.aemet.es/opendata/datos/estacion_7211B.json";
@@ -482,7 +498,7 @@ public class AemetRunnerTest {
     void shouldFailWhenDownloadedDataIsNotAnArray() {
         RestClient.Builder clientBuilder = RestClient.builder();
         MockRestServiceServer server = MockRestServiceServer.bindTo(clientBuilder).build();
-        AemetRunner runner = new AemetRunner(clientBuilder, "test-api-key");
+        AemetRunner runner = new AemetRunner(clientBuilder, "test-api-key", repository);
 
         String expectedUrl = "https://opendata.aemet.es/opendata/api/valores/climatologicos/inventarioestaciones/estaciones/7211B";
         String datosUrl = "https://opendata.aemet.es/opendata/datos/estacion_7211B.json";
@@ -514,7 +530,7 @@ public class AemetRunnerTest {
     void shouldFailWhenStationEntryIsNotAnObject() {
         RestClient.Builder clientBuilder = RestClient.builder();
         MockRestServiceServer server = MockRestServiceServer.bindTo(clientBuilder).build();
-        AemetRunner runner = new AemetRunner(clientBuilder, "test-api-key");
+        AemetRunner runner = new AemetRunner(clientBuilder, "test-api-key", repository);
 
         String expectedUrl = "https://opendata.aemet.es/opendata/api/valores/climatologicos/inventarioestaciones/estaciones/7211B";
         String datosUrl = "https://opendata.aemet.es/opendata/datos/estacion_7211B.json";
@@ -546,7 +562,7 @@ public class AemetRunnerTest {
     void shouldFailWhenLaterStationEntryIsNotAnObject() {
         RestClient.Builder clientBuilder = RestClient.builder();
         MockRestServiceServer server = MockRestServiceServer.bindTo(clientBuilder).build();
-        AemetRunner runner = new AemetRunner(clientBuilder, "test-api-key");
+        AemetRunner runner = new AemetRunner(clientBuilder, "test-api-key", repository);
 
         String expectedUrl = "https://opendata.aemet.es/opendata/api/valores/climatologicos/inventarioestaciones/estaciones/7211B";
         String datosUrl = "https://opendata.aemet.es/opendata/datos/estacion_7211B.json";
@@ -578,7 +594,7 @@ public class AemetRunnerTest {
     void shouldFailWhenStationIdentifierIsMissing() {
         RestClient.Builder clientBuilder = RestClient.builder();
         MockRestServiceServer server = MockRestServiceServer.bindTo(clientBuilder).build();
-        AemetRunner runner = new AemetRunner(clientBuilder, "test-api-key");
+        AemetRunner runner = new AemetRunner(clientBuilder, "test-api-key", repository);
 
         String expectedUrl = "https://opendata.aemet.es/opendata/api/valores/climatologicos/inventarioestaciones/estaciones/7211B";
         String datosUrl = "https://opendata.aemet.es/opendata/datos/estacion_7211B.json";
@@ -610,7 +626,7 @@ public class AemetRunnerTest {
     void shouldFailWhenStationIdentifierIsNull() {
         RestClient.Builder clientBuilder = RestClient.builder();
         MockRestServiceServer server = MockRestServiceServer.bindTo(clientBuilder).build();
-        AemetRunner runner = new AemetRunner(clientBuilder, "test-api-key");
+        AemetRunner runner = new AemetRunner(clientBuilder, "test-api-key", repository);
 
         String expectedUrl = "https://opendata.aemet.es/opendata/api/valores/climatologicos/inventarioestaciones/estaciones/7211B";
         String datosUrl = "https://opendata.aemet.es/opendata/datos/estacion_7211B.json";
@@ -641,7 +657,7 @@ public class AemetRunnerTest {
     void shouldFailWhenStationIdentifierIsNotAString() {
         RestClient.Builder clientBuilder = RestClient.builder();
         MockRestServiceServer server = MockRestServiceServer.bindTo(clientBuilder).build();
-        AemetRunner runner = new AemetRunner(clientBuilder, "test-api-key");
+        AemetRunner runner = new AemetRunner(clientBuilder, "test-api-key", repository);
 
         String expectedUrl = "https://opendata.aemet.es/opendata/api/valores/climatologicos/inventarioestaciones/estaciones/7211B";
         String datosUrl = "https://opendata.aemet.es/opendata/datos/estacion_7211B.json";
@@ -672,7 +688,7 @@ public class AemetRunnerTest {
     void shouldFailWhenStationIdentifierIsEmpty() {
         RestClient.Builder clientBuilder = RestClient.builder();
         MockRestServiceServer server = MockRestServiceServer.bindTo(clientBuilder).build();
-        AemetRunner runner = new AemetRunner(clientBuilder, "test-api-key");
+        AemetRunner runner = new AemetRunner(clientBuilder, "test-api-key", repository);
 
         String expectedUrl = "https://opendata.aemet.es/opendata/api/valores/climatologicos/inventarioestaciones/estaciones/7211B";
         String datosUrl = "https://opendata.aemet.es/opendata/datos/estacion_7211B.json";
@@ -706,7 +722,7 @@ public class AemetRunnerTest {
     void shouldDistinguishApplicationFailureFromHttpFailure() {
         RestClient.Builder builder = RestClient.builder();
         MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
-        AemetRunner runner = new AemetRunner(builder, "test-api-key");
+        AemetRunner runner = new AemetRunner(builder, "test-api-key", repository);
         server.expect(requestTo(INVENTORY_URL)).andRespond(withSuccess(
                 "{\"estado\":401,\"descripcion\":\"private response text\"}", MediaType.APPLICATION_JSON));
 
@@ -721,7 +737,7 @@ public class AemetRunnerTest {
     void shouldRejectEmptyFirstResponseBodyWithoutExposingResponse() {
         RestClient.Builder builder = RestClient.builder();
         MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
-        AemetRunner runner = new AemetRunner(builder, "test-api-key");
+        AemetRunner runner = new AemetRunner(builder, "test-api-key", repository);
         server.expect(requestTo(INVENTORY_URL)).andRespond(withSuccess("", MediaType.APPLICATION_JSON));
 
         IllegalStateException error = assertThrows(IllegalStateException.class, runner::run);
@@ -735,7 +751,7 @@ public class AemetRunnerTest {
     void shouldRejectNullFirstResponseBody() {
         RestClient.Builder builder = RestClient.builder();
         MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
-        AemetRunner runner = new AemetRunner(builder, "test-api-key");
+        AemetRunner runner = new AemetRunner(builder, "test-api-key", repository);
         server.expect(requestTo(INVENTORY_URL)).andRespond(withSuccess());
 
         IllegalStateException error = assertThrows(IllegalStateException.class, runner::run);
@@ -748,7 +764,7 @@ public class AemetRunnerTest {
     void shouldRejectWhitespaceFirstResponseBody() {
         RestClient.Builder builder = RestClient.builder();
         MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
-        AemetRunner runner = new AemetRunner(builder, "test-api-key");
+        AemetRunner runner = new AemetRunner(builder, "test-api-key", repository);
         server.expect(requestTo(INVENTORY_URL)).andRespond(withSuccess(" \r\n ", MediaType.APPLICATION_JSON));
 
         IllegalStateException error = assertThrows(IllegalStateException.class, runner::run);
@@ -761,7 +777,7 @@ public class AemetRunnerTest {
     void shouldDistinguishMalformedInventoryJsonFromInvalidEnvelopeStructure() {
         RestClient.Builder builder = RestClient.builder();
         MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
-        AemetRunner runner = new AemetRunner(builder, "test-api-key");
+        AemetRunner runner = new AemetRunner(builder, "test-api-key", repository);
         server.expect(requestTo(INVENTORY_URL)).andRespond(withSuccess("{broken", MediaType.APPLICATION_JSON));
 
         IllegalStateException error = assertThrows(IllegalStateException.class, runner::run);
@@ -775,7 +791,7 @@ public class AemetRunnerTest {
     void shouldRejectInventoryEnvelopeWithoutApplicationStatusAsStructureError() {
         RestClient.Builder builder = RestClient.builder();
         MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
-        AemetRunner runner = new AemetRunner(builder, "test-api-key");
+        AemetRunner runner = new AemetRunner(builder, "test-api-key", repository);
         server.expect(requestTo(INVENTORY_URL)).andRespond(withSuccess("{}", MediaType.APPLICATION_JSON));
 
         IllegalStateException error = assertThrows(IllegalStateException.class, runner::run);
@@ -789,7 +805,7 @@ public class AemetRunnerTest {
         for (String body : new String[] { "[]", "true" }) {
             RestClient.Builder builder = RestClient.builder();
             MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
-            AemetRunner runner = new AemetRunner(builder, "test-api-key");
+            AemetRunner runner = new AemetRunner(builder, "test-api-key", repository);
             server.expect(requestTo(INVENTORY_URL)).andRespond(withSuccess(body, MediaType.APPLICATION_JSON));
 
             IllegalStateException error = assertThrows(IllegalStateException.class, runner::run);
@@ -804,7 +820,7 @@ public class AemetRunnerTest {
         for (String body : new String[] { "{\"estado\":null}", "{\"estado\":\"200\"}" }) {
             RestClient.Builder builder = RestClient.builder();
             MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
-            AemetRunner runner = new AemetRunner(builder, "test-api-key");
+            AemetRunner runner = new AemetRunner(builder, "test-api-key", repository);
             server.expect(requestTo(INVENTORY_URL)).andRespond(withSuccess(body, MediaType.APPLICATION_JSON));
 
             IllegalStateException error = assertThrows(IllegalStateException.class, runner::run);
@@ -883,7 +899,7 @@ public class AemetRunnerTest {
             }
         };
         RestClient.Builder builder = RestClient.builder().requestFactory(requestFactory);
-        AemetRunner runner = new AemetRunner(builder, "test-api-key");
+        AemetRunner runner = new AemetRunner(builder, "test-api-key", repository);
 
         IllegalStateException error = assertThrows(IllegalStateException.class, runner::run);
 
@@ -897,7 +913,7 @@ public class AemetRunnerTest {
     void shouldRejectWhitespaceSecondResponseBody() {
         RestClient.Builder builder = RestClient.builder();
         MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
-        AemetRunner runner = new AemetRunner(builder, "test-api-key");
+        AemetRunner runner = new AemetRunner(builder, "test-api-key", repository);
         server.expect(requestTo(INVENTORY_URL)).andRespond(withSuccess(
                 "{\"estado\":200,\"datos\":\"" + DATA_URL + "\"}", MediaType.APPLICATION_JSON));
         server.expect(requestTo(DATA_URL)).andRespond(withSuccess(" \r\n ", MediaType.APPLICATION_JSON));
@@ -913,7 +929,7 @@ public class AemetRunnerTest {
     void shouldRejectNullSecondResponseBody() {
         RestClient.Builder builder = RestClient.builder();
         MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
-        AemetRunner runner = new AemetRunner(builder, "test-api-key");
+        AemetRunner runner = new AemetRunner(builder, "test-api-key", repository);
         server.expect(requestTo(INVENTORY_URL)).andRespond(withSuccess(
                 "{\"estado\":200,\"datos\":\"" + DATA_URL + "\"}", MediaType.APPLICATION_JSON));
         server.expect(requestTo(DATA_URL)).andRespond(withSuccess());
@@ -928,7 +944,7 @@ public class AemetRunnerTest {
     void shouldRejectEmptySecondResponseBody() {
         RestClient.Builder builder = RestClient.builder();
         MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
-        AemetRunner runner = new AemetRunner(builder, "test-api-key");
+        AemetRunner runner = new AemetRunner(builder, "test-api-key", repository);
         server.expect(requestTo(INVENTORY_URL)).andRespond(withSuccess(
                 "{\"estado\":200,\"datos\":\"" + DATA_URL + "\"}", MediaType.APPLICATION_JSON));
         server.expect(requestTo(DATA_URL)).andRespond(withSuccess("", MediaType.APPLICATION_JSON));
@@ -943,7 +959,7 @@ public class AemetRunnerTest {
     void shouldRejectEmptyStationInventory() {
         RestClient.Builder builder = RestClient.builder();
         MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
-        AemetRunner runner = new AemetRunner(builder, "test-api-key");
+        AemetRunner runner = new AemetRunner(builder, "test-api-key", repository);
         server.expect(requestTo(INVENTORY_URL)).andRespond(withSuccess(
                 "{\"estado\":200,\"datos\":\"" + DATA_URL + "\"}", MediaType.APPLICATION_JSON));
         server.expect(requestTo(DATA_URL)).andRespond(withSuccess("[]", MediaType.APPLICATION_JSON));
@@ -958,7 +974,7 @@ public class AemetRunnerTest {
     void shouldRejectWhitespaceStationIdentifier() {
         RestClient.Builder builder = RestClient.builder();
         MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
-        AemetRunner runner = new AemetRunner(builder, "test-api-key");
+        AemetRunner runner = new AemetRunner(builder, "test-api-key", repository);
         server.expect(requestTo(INVENTORY_URL)).andRespond(withSuccess(
                 "{\"estado\":200,\"datos\":\"" + DATA_URL + "\"}", MediaType.APPLICATION_JSON));
         server.expect(requestTo(DATA_URL))
@@ -984,7 +1000,7 @@ public class AemetRunnerTest {
     void shouldMapHttpClientFailureAtDataStageWithoutCredential() {
         RestClient.Builder builder = RestClient.builder();
         MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
-        AemetRunner runner = new AemetRunner(builder, "test-api-key");
+        AemetRunner runner = new AemetRunner(builder, "test-api-key", repository);
         server.expect(requestTo(INVENTORY_URL)).andRespond(withSuccess(
                 "{\"estado\":200,\"datos\":\"" + DATA_URL + "\"}", MediaType.APPLICATION_JSON));
         server.expect(requestTo(DATA_URL)).andExpect(headerDoesNotExist("api_key"))
@@ -999,7 +1015,7 @@ public class AemetRunnerTest {
 
     @Test
     void shouldRejectMissingApiKeyWithoutMakingARequest() {
-        AemetRunner runner = new AemetRunner(RestClient.builder(), null);
+        AemetRunner runner = new AemetRunner(RestClient.builder(), null, repository);
 
         IllegalStateException error = assertThrows(IllegalStateException.class, runner::run);
 
@@ -1007,7 +1023,7 @@ public class AemetRunnerTest {
         assertNull(error.getCause());
 
         IllegalStateException blankError = assertThrows(IllegalStateException.class,
-                () -> new AemetRunner(RestClient.builder(), " \t ").run());
+                () -> new AemetRunner(RestClient.builder(), " \t ", repository).run());
         assertEquals("AEMET API key is missing or invalid.", blankError.getMessage());
     }
 
@@ -1016,7 +1032,7 @@ public class AemetRunnerTest {
         RestClient.Builder builder = RestClient.builder().requestFactory((uri, method) -> {
             throw new java.io.IOException("test-api-key?secret=query-payload");
         });
-        AemetRunner runner = new AemetRunner(builder, "test-api-key");
+        AemetRunner runner = new AemetRunner(builder, "test-api-key", repository);
 
         IllegalStateException error = assertThrows(IllegalStateException.class, runner::run);
 
@@ -1031,7 +1047,7 @@ public class AemetRunnerTest {
         String linkedUrl = "https://opendata.aemet.es/opendata/datos/estacion.json?private=query-value";
         RestClient.Builder builder = RestClient.builder();
         MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
-        AemetRunner runner = new AemetRunner(builder, "test-api-key");
+        AemetRunner runner = new AemetRunner(builder, "test-api-key", repository);
         server.expect(requestTo(INVENTORY_URL)).andExpect(header("api_key", "test-api-key"))
                 .andRespond(withSuccess(
                         "{\"estado\":200,\"datos\":\"" + linkedUrl + "\"}", MediaType.APPLICATION_JSON));
@@ -1060,7 +1076,7 @@ public class AemetRunnerTest {
         RestClient.Builder builder = RestClient.builder();
         MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
 
-        AemetRunner runner = new AemetRunner(builder, "test-api-key");
+        AemetRunner runner = new AemetRunner(builder, "test-api-key", repository);
 
         server.expect(requestTo(INVENTORY_URL))
                 .andExpect(header("api_key", "test-api-key"))
@@ -1086,10 +1102,104 @@ public class AemetRunnerTest {
         server.verify();
     }
 
+    @ParameterizedTest
+    @MethodSource("optionalStationNames")
+    void savesMissingStationWithExactValuesAndReturnsGeneratedId(String nameField, String name) {
+        RestClient.Builder builder = RestClient.builder();
+        MockRestServiceServer server = inventoryResponse(builder,
+                "[{\"indicativo\":\"7211B\"" + nameField + "}]");
+        when(repository.findId("AEMET", "7211B")).thenReturn(Optional.empty());
+        when(repository.save("AEMET", "7211B", name)).thenReturn(73L);
+
+        assertEquals(73L, new AemetRunner(builder, "test-api-key", repository).importStationInventory());
+
+        var order = inOrder(repository);
+        order.verify(repository).findId("AEMET", "7211B");
+        order.verify(repository).save("AEMET", "7211B", name);
+        verifyNoMoreInteractions(repository);
+        server.verify();
+    }
+
+    static Stream<Arguments> optionalStationNames() {
+        return Stream.of(
+                Arguments.of("", null),
+                Arguments.of(",\"nombre\":null", null),
+                Arguments.of(",\"nombre\":\"  Station O'Brien  \"", "  Station O'Brien  "),
+                Arguments.of(",\"nombre\":\"\"", ""));
+    }
+
+    @Test
+    void reusesExistingIdWithoutSavingDifferentName() {
+        RestClient.Builder builder = RestClient.builder();
+        MockRestServiceServer server = inventoryResponse(builder,
+                "[{\"indicativo\":\"7211B\",\"nombre\":\"Different name\"}]");
+        when(repository.findId("AEMET", "7211B")).thenReturn(Optional.of(42L));
+
+        assertEquals(42L, new AemetRunner(builder, "test-api-key", repository).importStationInventory());
+
+        verify(repository).findId("AEMET", "7211B");
+        verifyNoMoreInteractions(repository);
+        server.verify();
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "{broken", "null", "{}", "[]", "[123]", "[{}]",
+            "[{\"indicativo\":\"7211B\"},123]",
+            "[{\"indicativo\":\"7211B\"},{\"indicativo\":\"9999X\"}]",
+            "[{\"indicativo\":\"7211B\",\"nombre\":123}]",
+            "[{\"indicativo\":\"7211B\",\"nombre\":false}]",
+            "[{\"indicativo\":\"7211B\",\"nombre\":{}}]",
+            "[{\"indicativo\":\"7211B\",\"nombre\":[]}]",
+            "[{\"indicativo\":\"7211B\"},{\"indicativo\":\"7211B\",\"nombre\":123}]"
+    })
+    void rejectsWholeInvalidInventoryBeforeAnyPersistence(String body) {
+        RestClient.Builder builder = RestClient.builder();
+        MockRestServiceServer server = inventoryResponse(builder, body);
+
+        assertThrows(IllegalStateException.class,
+                () -> new AemetRunner(builder, "test-api-key", repository).run());
+
+        verifyNoInteractions(repository);
+        server.verify();
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = { false, true })
+    void propagatesLookupAndSaveFailuresInsteadOfHttpFailureOrSuccess(boolean failSave) {
+        RestClient.Builder builder = RestClient.builder();
+        MockRestServiceServer server = inventoryResponse(builder, "[{\"indicativo\":\"7211B\"}]");
+        var failure = new DataAccessResourceFailureException("Simulated database failure");
+        if (failSave) {
+            when(repository.findId("AEMET", "7211B")).thenReturn(Optional.empty());
+            when(repository.save("AEMET", "7211B", null)).thenThrow(failure);
+        } else {
+            when(repository.findId("AEMET", "7211B")).thenThrow(failure);
+        }
+
+        assertSame(failure, assertThrows(DataAccessResourceFailureException.class,
+                () -> new AemetRunner(builder, "test-api-key", repository).run()));
+
+        verify(repository).findId("AEMET", "7211B");
+        if (failSave) {
+            verify(repository).save("AEMET", "7211B", null);
+        }
+        verifyNoMoreInteractions(repository);
+        server.verify();
+    }
+
+    private MockRestServiceServer inventoryResponse(RestClient.Builder builder, String body) {
+        MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
+        server.expect(requestTo(INVENTORY_URL)).andRespond(withSuccess(
+                "{\"estado\":200,\"datos\":\"" + DATA_URL + "\"}", MediaType.APPLICATION_JSON));
+        server.expect(requestTo(DATA_URL)).andRespond(withSuccess(body, MediaType.APPLICATION_JSON));
+        return server;
+    }
+
     private void assertHttpServerFailure(String failedUrl, boolean failDataRequest) {
         RestClient.Builder builder = RestClient.builder();
         MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
-        AemetRunner runner = new AemetRunner(builder, "test-api-key");
+        AemetRunner runner = new AemetRunner(builder, "test-api-key", repository);
         if (failDataRequest) {
             server.expect(requestTo(INVENTORY_URL)).andRespond(withSuccess(
                     "{\"estado\":200,\"datos\":\"" + DATA_URL + "\"}", MediaType.APPLICATION_JSON));
