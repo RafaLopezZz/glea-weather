@@ -1,0 +1,38 @@
+ rlpdev@RLP-PC  D:\2026 - IABD_ilerna\Proyecto IABD\GleaWeather\weather  master  psql -X -h localhost -p 5432 -d gleaweather_test -v ON_ERROR_STOP=1 -f src/main/resources/db/005-fix-persisted-requires-complete-result.sql
+Contraseña para usuario postgres:
+
+BEGIN
+ALTER TABLE
+COMMIT
+ rlpdev@RLP-PC  D:\2026 - IABD_ilerna\Proyecto IABD\GleaWeather\weather  master  psql -X -h localhost -p 5432 -d gleaweather_test -f src/test/resources/sql/acquisition-results-and-records-contract.sql
+Contraseña para usuario postgres:
+
+BEGIN
+psql:src/test/resources/sql/acquisition-results-and-records-contract.sql:238: NOTICE:  PASS: new run starts unfinished and pending
+psql:src/test/resources/sql/acquisition-results-and-records-contract.sql:238: NOTICE:  PASS: result without completed_at is rejected
+psql:src/test/resources/sql/acquisition-results-and-records-contract.sql:238: NOTICE:  PASS: completed_at without result is rejected
+psql:src/test/resources/sql/acquisition-results-and-records-contract.sql:238: NOTICE:  PASS: result partial is out of scope and rejected
+psql:src/test/resources/sql/acquisition-results-and-records-contract.sql:238: NOTICE:  PASS: completed_at before requested_at is rejected
+psql:src/test/resources/sql/acquisition-results-and-records-contract.sql:238: NOTICE:  PASS: persisted_at while pending is rejected
+psql:src/test/resources/sql/acquisition-results-and-records-contract.sql:238: NOTICE:  PASS: complete persistence without persisted_at is rejected
+psql:src/test/resources/sql/acquisition-results-and-records-contract.sql:238: NOTICE:  PASS: a failed download cannot be marked as persisted
+psql:src/test/resources/sql/acquisition-results-and-records-contract.sql:238: NOTICE:  PASS: a run without result cannot be marked as persisted
+psql:src/test/resources/sql/acquisition-results-and-records-contract.sql:238: NOTICE:  PASS: persisted_at before completed_at is rejected
+psql:src/test/resources/sql/acquisition-results-and-records-contract.sql:238: NOTICE:  PASS: complete download followed by confirmed persistence is accepted
+psql:src/test/resources/sql/acquisition-results-and-records-contract.sql:238: NOTICE:  PASS: valid raw file is accepted
+psql:src/test/resources/sql/acquisition-results-and-records-contract.sql:238: NOTICE:  PASS: duplicate path in the same run is rejected
+psql:src/test/resources/sql/acquisition-results-and-records-contract.sql:238: NOTICE:  PASS: duplicate chunk in the same run is rejected
+psql:src/test/resources/sql/acquisition-results-and-records-contract.sql:238: NOTICE:  PASS: empty or inverted chunk is rejected
+psql:src/test/resources/sql/acquisition-results-and-records-contract.sql:238: NOTICE:  PASS: zero-byte file is rejected
+psql:src/test/resources/sql/acquisition-results-and-records-contract.sql:238: NOTICE:  PASS: non-canonical SHA-256 is rejected
+psql:src/test/resources/sql/acquisition-results-and-records-contract.sql:238: NOTICE:  PASS: path with .. is rejected
+psql:src/test/resources/sql/acquisition-results-and-records-contract.sql:238: NOTICE:  PASS: absolute path is rejected
+psql:src/test/resources/sql/acquisition-results-and-records-contract.sql:238: NOTICE:  PASS: raw file of an unknown run is rejected
+psql:src/test/resources/sql/acquisition-results-and-records-contract.sql:238: NOTICE:  PASS: repeated dates, special values and unknown dates are kept
+psql:src/test/resources/sql/acquisition-results-and-records-contract.sql:238: NOTICE:  PASS: loading the same position twice is rejected (no silent duplicates)
+psql:src/test/resources/sql/acquisition-results-and-records-contract.sql:238: NOTICE:  PASS: negative position is rejected
+psql:src/test/resources/sql/acquisition-results-and-records-contract.sql:238: NOTICE:  PASS: non-object payload is rejected
+psql:src/test/resources/sql/acquisition-results-and-records-contract.sql:238: NOTICE:  PASS: evidence is protected (raw file with records cannot be deleted)
+psql:src/test/resources/sql/acquisition-results-and-records-contract.sql:238: NOTICE:  PASS: evidence is protected (run with files cannot be deleted)
+DO
+ROLLBACK
