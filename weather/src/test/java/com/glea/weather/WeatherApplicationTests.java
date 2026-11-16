@@ -6,6 +6,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.client.RestClient;
 
+import com.glea.weather.station.AemetRunner;
+import com.glea.weather.station.StationRepository;
+
 import static org.mockito.Mockito.verify;
 
 @SpringBootTest(properties = { "spring.config.import=", "AEMET_API_KEY=test-only-placeholder",
@@ -31,15 +34,15 @@ class WeatherApplicationTests {
     @jakarta.annotation.Resource
     private StationRepository stationRepository;
 
-	@Test
-	void contextLoads() {
-		org.junit.jupiter.api.Assertions.assertEquals("test-only-placeholder", apiKey);
-		org.junit.jupiter.api.Assertions.assertNotNull(runner);
-		org.junit.jupiter.api.Assertions.assertNotNull(restClientBuilder);
-		org.junit.jupiter.api.Assertions.assertNotNull(dataSource);
-		org.junit.jupiter.api.Assertions.assertNotNull(jdbcClient);
-		org.junit.jupiter.api.Assertions.assertNotNull(stationRepository);
-		verify(runner).run();
-	}
+    @Test
+    void contextLoads() {
+        org.junit.jupiter.api.Assertions.assertEquals("test-only-placeholder", apiKey);
+        org.junit.jupiter.api.Assertions.assertNotNull(runner);
+        org.junit.jupiter.api.Assertions.assertNotNull(restClientBuilder);
+        org.junit.jupiter.api.Assertions.assertNotNull(dataSource);
+        org.junit.jupiter.api.Assertions.assertNotNull(jdbcClient);
+        org.junit.jupiter.api.Assertions.assertNotNull(stationRepository);
+        verify(runner).run();
+    }
 
 }

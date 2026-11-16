@@ -1,10 +1,12 @@
-package com.glea.weather;
+package com.glea.weather.acquisition;
 
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.UUID;
 
-/** Request metadata only; the end date is exclusive and does not imply coverage. */
+/**
+ * Request metadata only; the end date is exclusive and does not imply coverage.
+ */
 public record AcquisitionRun(UUID runId, Long stationId, LocalDate requestedStart,
         LocalDate requestedEnd, Instant requestedAt) {
 

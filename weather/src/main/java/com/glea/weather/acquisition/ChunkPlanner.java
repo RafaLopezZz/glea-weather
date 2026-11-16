@@ -1,11 +1,12 @@
-package com.glea.weather;
+package com.glea.weather.acquisition;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Splits a requested period [start, end) into consecutive windows that AEMET accepts.
+ * Splits a requested period [start, end) into consecutive windows that AEMET
+ * accepts.
  * Each window starts exactly where the previous one ended, so the windows never
  * overlap and never leave gaps. No network or database access.
  */

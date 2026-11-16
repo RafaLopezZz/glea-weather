@@ -1,4 +1,4 @@
-package com.glea.weather;
+package com.glea.weather.aemet;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -18,6 +18,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
+
+import com.glea.weather.acquisition.DateChunk;
 
 class AemetOpenDataClientTest {
 

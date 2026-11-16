@@ -1,4 +1,4 @@
-package com.glea.weather;
+package com.glea.weather.raw;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -14,11 +14,17 @@ import java.util.HexFormat;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
+import com.glea.weather.acquisition.DateChunk;
+import com.glea.weather.aemet.AemetPayload;
+
 /**
  * Immutable store for original AEMET responses.
- * Layout: {@code <root>/<station>/<run_id>/<start>_<end>.json}. A file is written once:
- * bytes go to a temporary file in the same folder, are forced to disk and then renamed in
- * one atomic step, so an interrupted write never leaves a truncated file with a final name.
+ * Layout: {@code <root>/<station>/<run_id>/<start>_<end>.json}. A file is
+ * written once:
+ * bytes go to a temporary file in the same folder, are forced to disk and then
+ * renamed in
+ * one atomic step, so an interrupted write never leaves a truncated file with a
+ * final name.
  */
 public class RawFileStore {
 
@@ -33,7 +39,10 @@ public class RawFileStore {
         this.root = root.toAbsolutePath().normalize();
     }
 
-    /** Relative path inside the RAW root, always with '/' so it is portable and fits raw_files. */
+    /**
+     * Relative path inside the RAW root, always with '/' so it is portable and fits
+     * raw_files.
+     */
     static String relativePath(String stationId, UUID runId, DateChunk chunk) {
         if (stationId == null || !STATION_ID.matcher(stationId).matches()) {
             throw new IllegalArgumentException("Invalid station identifier.");
@@ -47,8 +56,10 @@ public class RawFileStore {
     /**
      * Writes the payload once and returns its relative path, size and SHA-256.
      *
-     * @throws IllegalStateException if the file already exists (originals are never overwritten)
-     * @throws UncheckedIOException if the disk write fails; no final file is left behind
+     * @throws IllegalStateException if the file already exists (originals are never
+     *                               overwritten)
+     * @throws UncheckedIOException  if the disk write fails; no final file is left
+     *                               behind
      */
     public StoredRawFile store(String stationId, UUID runId, DateChunk chunk, AemetPayload payload) {
         if (payload == null) {
@@ -88,7 +99,10 @@ public class RawFileStore {
         return new StoredRawFile(relative, bytes.length, sha256(bytes));
     }
 
-    /** Recomputes the SHA-256 of a stored file and compares it with the expected value. */
+    /**
+     * Recomputes the SHA-256 of a stored file and compares it with the expected
+     * value.
+     */
     public boolean verify(StoredRawFile expected) {
         Path file = resolve(expected.relativePath());
         try {
@@ -108,7 +122,10 @@ public class RawFileStore {
         }
     }
 
-    /** Resolves a relative path and refuses anything that would land outside the root. */
+    /**
+     * Resolves a relative path and refuses anything that would land outside the
+     * root.
+     */
     private Path resolve(String relative) {
         Path resolved = root.resolve(relative).normalize();
         if (!resolved.startsWith(root)) {

@@ -1,4 +1,4 @@
-package com.glea.weather;
+package com.glea.weather.acquisition;
 
 import java.time.ZoneOffset;
 

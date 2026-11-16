@@ -1,4 +1,4 @@
-package com.glea.weather;
+package com.glea.weather.station;
 
 import javax.sql.DataSource;
 
@@ -8,7 +8,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
-/** JDBC wiring for manual catalogue imports; bean creation opens no connections. */
+/**
+ * JDBC wiring for manual catalogue imports; bean creation opens no connections.
+ */
 @Configuration(proxyBeanMethods = false)
 public class StationConfiguration {
 

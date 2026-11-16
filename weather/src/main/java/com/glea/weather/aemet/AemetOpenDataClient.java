@@ -1,4 +1,4 @@
-package com.glea.weather;
+package com.glea.weather.aemet;
 
 import java.net.URI;
 import java.nio.charset.Charset;
@@ -13,6 +13,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
+
+import com.glea.weather.acquisition.DateChunk;
 
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.JsonNode;

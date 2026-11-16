@@ -1,4 +1,4 @@
-package com.glea.weather;
+package com.glea.weather.station;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+
+import com.glea.weather.aemet.AemetClientConfiguration;
 
 class StationConfigurationTest {
 

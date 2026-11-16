@@ -1,4 +1,4 @@
-package com.glea.weather;
+package com.glea.weather.station;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -15,6 +15,7 @@ import static org.mockito.Mockito.when;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatusCode;

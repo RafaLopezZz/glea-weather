@@ -1,4 +1,4 @@
-package com.glea.weather;
+package com.glea.weather.station;
 
 import java.sql.Types;
 import java.util.Optional;

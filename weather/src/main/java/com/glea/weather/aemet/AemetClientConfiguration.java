@@ -1,4 +1,4 @@
-package com.glea.weather;
+package com.glea.weather.aemet;
 
 import java.net.http.HttpClient;
 import java.time.Duration;
@@ -16,9 +16,11 @@ public class AemetClientConfiguration {
     static final Duration READ_TIMEOUT = Duration.ofSeconds(2);
 
     /**
-     * Supplies the client builder used by the runner without relying on Boot's defaults.
+     * Supplies the client builder used by the runner without relying on Boot's
+     * defaults.
      *
-     * @return a RestClient builder with finite connect/read timeouts and redirects disabled
+     * @return a RestClient builder with finite connect/read timeouts and redirects
+     *         disabled
      */
     @Bean
     RestClient.Builder aemetRestClientBuilder() {

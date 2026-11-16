@@ -1,4 +1,4 @@
-package com.glea.weather;
+package com.glea.weather.station;
 
 import java.net.URI;
 
@@ -14,7 +14,8 @@ import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
 
 /**
- * Reads, validates and resolves the AEMET station inventory in the JDBC catalogue.
+ * Reads, validates and resolves the AEMET station inventory in the JDBC
+ * catalogue.
  * The API key is sent only to the fixed inventory endpoint; the returned data
  * URL
  * must pass the HTTPS host allowlist before it is requested.
@@ -34,8 +35,8 @@ public class AemetRunner implements CommandLineRunner {
     /**
      * Creates the runner using Spring's shared client builder.
      *
-     * @param builder configured client builder
-     * @param apiKey  configured credential, which may be absent or blank
+     * @param builder           configured client builder
+     * @param apiKey            configured credential, which may be absent or blank
      * @param stationRepository station catalogue
      */
     public AemetRunner(RestClient.Builder builder, @Value("${AEMET_API_KEY:}") String apiKey,
@@ -49,16 +50,21 @@ public class AemetRunner implements CommandLineRunner {
      * Fetches and fully validates the inventory before resolving its catalogue id.
      *
      * @param args unused command-line arguments
-     * @throws IllegalStateException when configuration, transport, HTTP, JSON, or
-     *                               data validation fails
-     * @throws org.springframework.dao.DataAccessException when catalogue persistence fails
+     * @throws IllegalStateException                       when configuration,
+     *                                                     transport, HTTP, JSON, or
+     *                                                     data validation fails
+     * @throws org.springframework.dao.DataAccessException when catalogue
+     *                                                     persistence fails
      */
     @Override
     public void run(String... args) {
         importStationInventory();
     }
 
-    /** Returns the existing or generated catalogue id after validating the entire response. */
+    /**
+     * Returns the existing or generated catalogue id after validating the entire
+     * response.
+     */
     long importStationInventory() {
         if (apiKey == null || apiKey.isBlank()) {
             throw new IllegalStateException("AEMET API key is missing or invalid.");
@@ -135,7 +141,8 @@ public class AemetRunner implements CommandLineRunner {
             }
         }
 
-        // Every entry refers to the requested station; resolve it once after full validation.
+        // Every entry refers to the requested station; resolve it once after full
+        // validation.
         JsonNode station = stations.get(0);
         String identifier = station.get("indicativo").stringValue();
         JsonNode name = station.get("nombre");

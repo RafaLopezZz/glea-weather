@@ -1,4 +1,4 @@
-package com.glea.weather;
+package com.glea.weather.acquisition;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -65,7 +65,8 @@ class ChunkPlannerTest {
         LocalDate end = LocalDate.of(2025, 1, 31);
         List<DateChunk> chunks = ChunkPlanner.plan(start, end);
 
-        // plusMonths(5) from 31 January clamps to 30 June; the next window starts there.
+        // plusMonths(5) from 31 January clamps to 30 June; the next window starts
+        // there.
         assertEquals(new DateChunk(start, LocalDate.of(2024, 6, 30)), chunks.get(0));
         for (int i = 1; i < chunks.size(); i++) {
             assertEquals(chunks.get(i - 1).end(), chunks.get(i).start());

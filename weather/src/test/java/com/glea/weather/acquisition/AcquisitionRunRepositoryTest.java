@@ -1,4 +1,4 @@
-package com.glea.weather;
+package com.glea.weather.acquisition;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -19,6 +19,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.simple.JdbcClient;
+
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 
 class AcquisitionRunRepositoryTest {
