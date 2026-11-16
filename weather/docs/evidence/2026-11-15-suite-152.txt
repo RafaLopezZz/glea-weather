@@ -1,0 +1,85 @@
+ rlpdev@RLP-PC  D:\2026 - IABD_ilerna\Proyecto IABD\GleaWeather\weather  master  GleaWeather 3.11.9  .\scripts\test-all.ps1
+[INFO] Scanning for projects...
+[INFO] Loaded 24501 auto-discovered prefixes for remote repository central (prefixes-central.txt)
+[INFO] 
+[INFO] --------------------------< com.glea:weather >--------------------------
+[INFO] Building weather 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.5.0:resources (default-resources) @ weather ---
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] Copying 5 resources from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.15.0:compile (default-compile) @ weather ---
+[INFO] Loaded 64 auto-discovered prefixes for remote repository apache.snapshots (prefixes-apache.snapshots.txt)
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.5.0:testResources (default-testResources) @ weather ---
+[INFO] Copying 3 resources from src\test\resources to target\test-classes
+[INFO] 
+[INFO] --- compiler:3.15.0:testCompile (default-testCompile) @ weather ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- surefire:3.5.6:test (default-test) @ weather ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running com.glea.weather.AcquisitionRunRepositoryPostgresTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.361 s -- in com.glea.weather.AcquisitionRunRepositoryPostgresTest
+[INFO] Running com.glea.weather.AcquisitionRunRepositoryTest
+Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build as described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+WARNING: A Java agent has been loaded dynamically (C:\Users\rlpdev\.m2\repository\net\bytebuddy\byte-buddy-agent\1.18.11\byte-buddy-agent-1.18.11.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+[INFO] Tests run: 13, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.718 s -- in com.glea.weather.AcquisitionRunRepositoryTest
+[INFO] Running com.glea.weather.AemetClientConfigurationTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.109 s -- in com.glea.weather.AemetClientConfigurationTest
+[INFO] Running com.glea.weather.AemetRunnerTest
+[INFO] Tests run: 64, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.433 s -- in com.glea.weather.AemetRunnerTest
+[INFO] Running com.glea.weather.AemetTransportTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.084 s -- in com.glea.weather.AemetTransportTest
+[INFO] Running com.glea.weather.ChunkPlannerTest
+[INFO] Tests run: 10, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.008 s -- in com.glea.weather.ChunkPlannerTest
+[INFO] Running com.glea.weather.StationConfigurationTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.076 s -- in com.glea.weather.StationConfigurationTest
+[INFO] Running com.glea.weather.StationRepositoryPostgresTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.041 s -- in com.glea.weather.StationRepositoryPostgresTest
+[INFO] Running com.glea.weather.StationRepositoryTest
+[INFO] Tests run: 15, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.056 s -- in com.glea.weather.StationRepositoryTest
+[INFO] Running com.glea.weather.StationValidatorTest
+[INFO] Tests run: 42, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.033 s -- in com.glea.weather.StationValidatorTest
+[INFO] Running com.glea.weather.WeatherApplicationTests
+20:37:05.479 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.glea.weather.WeatherApplicationTests]: WeatherApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+20:37:05.529 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.glea.weather.WeatherApplication for test class com.glea.weather.WeatherApplicationTests
+20:37:05.560 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.glea.weather.WeatherApplicationTests]: WeatherApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+20:37:05.561 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.glea.weather.WeatherApplication for test class com.glea.weather.WeatherApplicationTests
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.1.1)
+
+2026-11-15T20:37:05.722+01:00  INFO 1528 --- [weather] [           main] c.glea.weather.WeatherApplicationTests   : Starting WeatherApplicationTests using Java 25.0.4.1 with PID 1528 (started by rlpdevin D:\2026 - IABD_ilerna\Proyecto IABD\GleaWeather\weather)
+2026-11-15T20:37:05.724+01:00  INFO 1528 --- [weather] [           main] c.glea.weather.WeatherApplicationTests   : The following 1 profile is active: "dev"
+2026-11-15T20:37:06.050+01:00  INFO 1528 --- [weather] [           main] c.glea.weather.WeatherApplicationTests   : Started WeatherApplicationTests in 0.464 seconds (process running for 4.988)
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.605 s -- in com.glea.weather.WeatherApplicationTests
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 152, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  7.133 s
+[INFO] Finished at: 2026-11-15T20:37:06+01:00
+[INFO] ------------------------------------------------------------------------
